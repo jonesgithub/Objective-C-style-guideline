@@ -1,29 +1,29 @@
 Objective-C-style-guideline
 ===========================
 
-Most of these guidelines are to match Apple's documentation and community-accepted best practices. Some are derived some personal preference. This document aims to set a standard way of doing things so everyone can do things the same way. If there is something you are not particularly fond of, it is encouraged to do it anyway to be consistent with everyone else.
-
-This document is mainly targeted toward iOS development, but definitely applies to Mac as well.
+This guideline is made by Huy Ares. Use to create a standard of code for my projects.
 
 ## Table of Contents
 
 * [Dot-Notation Syntax](#dot-notation-syntax)
-* [Spacing](#spacing)
-* [Conditionals](#conditionals)
-* [Ternary Operator](#ternary-operator)
-* [Error handling](#error-handling)
+* [Operators](#operators)
+* [Types](#types)
 * [Methods](#methods)
-* [Variables](#variables)
+* [Pragma Mark and Implementation Organization](#pragma-mark-and-implementation-organization)
+* [Control Structures](#control-structures)
+* [Import](#import)
+* [Properties](#properties)
+* [Private Methods and Properties](#private-methods-and-properties)
+* [Extern, Const and Static](#extern-const-and-static)
 * [Naming](#naming)
-* [Underscores](#underscores)
-* [Comments](#comments)
-* [Init & Dealloc](#init-and-dealloc)
+* [Enums](#enums)
+* [Exceptions and Error Handling](#exceptions-and-error-handling)
+* [Blocks](#blocks)
 * [Literals](#literals)
+* [Categories](#categories)
 * [CGRect Functions](#cgrect-functions)
 * [Constants](#constants)
-* [Enumerated Types](#enumerated-types)
-* [Private Properties](#private-properties)
-* [Image Naming](#image-naming)
+* [Image Naming](#image-naming) 
 * [Booleans](#booleans)
 * [Singletons](#singletons)
 * [Xcode Project](#xcode-project)
@@ -310,7 +310,7 @@ MyShoeTier.m
 Note: The above example provides an example for an acceptable use of a `readwrite` property.
 
 
-## Extern, Const, and Static
+## Extern, Const and Static
 
 ```objective-c
 extern NSString *const kMyConstant;
@@ -504,3 +504,83 @@ static const CGFloat NYTImageThumbnailHeight = 50.0;
 
 #define thumbnailHeight 2
 ```
+
+## Image Naming
+
+Image names should be named consistently to preserve organization and developer sanity. They should be named as one camel case string with a description of their purpose, followed by the un-prefixed name of the class or property they are customizing (if there is one), followed by a further description of color and/or placement, and finally their state.
+
+**For example:**
+
+* `RefreshBarButtonItem` / `RefreshBarButtonItem@2x` and `RefreshBarButtonItemSelected` / `RefreshBarButtonItemSelected@2x`
+* `ArticleNavigationBarWhite` / `ArticleNavigationBarWhite@2x` and `ArticleNavigationBarBlackSelected` / `ArticleNavigationBarBlackSelected@2x`.
+
+Images that are used for a similar purpose should be grouped in respective groups in an Images folder.
+
+## Booleans
+
+Since `nil` resolves to `NO` it is unnecessary to compare it in conditions. Never compare something directly to `YES`, because `YES` is defined to 1 and a `BOOL` can be up to 8 bits.
+
+This allows for more consistency across files and greater visual clarity.
+
+**For example:**
+
+```objc
+if (!someObject) {
+}
+```
+
+**Not:**
+
+```objc
+if (someObject == nil) {
+}
+```
+
+-----
+
+**For a `BOOL`, here are two examples:**
+
+```objc
+if (isAwesome)
+if (![someObject boolValue])
+```
+
+**Not:**
+
+```objc
+if ([someObject boolValue] == NO)
+if (isAwesome == YES) // Never do this.
+```
+
+-----
+
+If the name of a `BOOL` property is expressed as an adjective, the property can omit the “is” prefix but specifies the conventional name for the get accessor, for example:
+
+```objc
+@property (assign, getter=isEditable) BOOL editable;
+```
+Text and example taken from the [Cocoa Naming Guidelines](https://developer.apple.com/library/mac/#documentation/Cocoa/Conceptual/CodingGuidelines/Articles/NamingIvarsAndTypes.html#//apple_ref/doc/uid/20001284-BAJGIIJE).
+
+
+## Singletons
+
+Singleton objects should use a thread-safe pattern for creating their shared instance.
+```objc
++ (instancetype)sharedInstance {
+   static id sharedInstance = nil;
+
+   static dispatch_once_t onceToken;
+   dispatch_once(&onceToken, ^{
+      sharedInstance = [[self alloc] init];
+   });
+
+   return sharedInstance;
+}
+```
+This will prevent [possible and sometimes prolific crashes](http://cocoasamurai.blogspot.com/2011/04/singletons-your-doing-them-wrong.html).
+
+## Xcode project
+
+The physical files should be kept in sync with the Xcode project files in order to avoid file sprawl. Any Xcode groups created should be reflected by folders in the filesystem. Code should be grouped not only by type, but also by feature for greater clarity.
+
+When possible, always turn on "Treat Warnings as Errors" in the target's Build Settings and enable as many [additional warnings](http://boredzo.org/blog/archives/2009-11-07/warnings) as possible. If you need to ignore a specific warning, use [Clang's pragma feature](http://clang.llvm.org/docs/UsersManual.html#controlling-diagnostics-via-pragmas).
