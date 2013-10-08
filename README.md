@@ -1,10 +1,6 @@
 Objective-C-style-guideline
 ===========================
 
-A standard style guideline for my project
-
-# Objective-C Coding Convention and Best Practices
-
 Most of these guidelines are to match Apple's documentation and community-accepted best practices. Some are derived some personal preference. This document aims to set a standard way of doing things so everyone can do things the same way. If there is something you are not particularly fond of, it is encouraged to do it anyway to be consistent with everyone else.
 
 This document is mainly targeted toward iOS development, but definitely applies to Mac as well.
@@ -19,7 +15,7 @@ answer++;
 answer = 40 + 2;
 ```
 
-The `++`, `--`, etc are preferred to be after the variable instead of before to be consistent with other operators. Operators separated should **always** be surrounded by spaces unless there is only one operand.
+The `++`, `--`, etc are preferred to be after the variable instead of before to be consistent with other operators. Operators separated should **always** be surrounded by **spaces** unless there is only one operand.
 
 
 ## Types
@@ -44,16 +40,16 @@ All Apple types should be used over primitive ones. For example, if you are work
 
 There should **always** be a space between the `-` or `+` and the return type (`(void)` in this example). There should **never** be a space between the return type and the method name.
 
-There should **never** be a space before or after colons. If the parameter type is a pointer, there should **always** be a space between the class and the `*`.
+There should **never** be a space before or after colons `(` `)`. If the parameter type is a pointer, there should **always** be a space between the class and the `*`.
 
-There should **always** be a space between the end of the method and the opening bracket. The opening bracket should **never** be on the following line.
+There should **always** be a space between the end of the method and the opening bracket `{`. The opening bracket should **never** be on the following line.
 
-There should **always** be two new lines between methods. This matches some Xcode templates (although they change a lot) and increase readability.
+There should **always** be `2` new lines between methods. This matches some Xcode templates (although they change a lot) and increase readability.
 
 
 ## Pragma Mark and Implementation Organization
 
-An excerpt of a UIView:
+An except of a UIView:
 
 ```objective-c
 #pragma mark - NSObject
@@ -81,7 +77,7 @@ Methods should be grouped by inheritance. In the above example, if some `UIRespo
 
 ## Control Structures
 
-There should **always** be a space after the control structure (i.e. `if`, `else`, etc).
+There should **always** be a `space` after the control structure (i.e. `if`, `else`, `switch`, `while`, `for`, `for in`, etc).
 
 
 ### If/Else
@@ -140,7 +136,7 @@ switch (something.state) {
 }
 ```
 
-Brackets are desired around each case. If multiple cases are used, they should be on separate lines. `default` should **always** be the last case and should **always** be included.
+Brackets `{ }` are desired around **each case**. If multiple cases are used, they should be on **separate lines**. `default` should **always** be the last case and should **always** be included.
 
 
 ### For
@@ -193,13 +189,14 @@ For example, if a header prefix looks like the following:
 ## Properties
 
 ```objective-c
-@property (nonatomic, retain) UIColor *topColor;
+@property (nonatomic, strong) UIColor *topColor;
+@property (nonatomic, weak) UIView *topView;
 @property (nonatomic, assign) CGSize shadowOffset;
 @property (nonatomic, retain, readonly) UIActivityIndicatorView *activityIndicator;
 @property (nonatomic, assign, getter=isLoading) BOOL loading;
 ```
 
-If the property is `nonatomic`, it should be first. The next option should **always** be `retain` or `assign` since if it is omitted, there is a warning. `readonly` should be the next option if it is specified. `readwrite` should never be specified in header file. `readwrite` should only be used in class extensions. `getter` or `setter` should be last. `setter` should rarely be used.
+If the property is `nonatomic`, it should be first. The next option should **always** be `strong`, `weak` or `assign` since if it is omitted, there is a warning. `readonly` should be the next option if it is specified. `readwrite` should never be specified in header file. `readwrite` should only be used in class extensions. `getter` or `setter` should be last. `setter` should rarely be used.
 
 See an example of `readwrite` in the *Private Methods* section.
 
@@ -209,13 +206,12 @@ See an example of `readwrite` in the *Private Methods* section.
 MyShoeTier.h
 
 ```objective-c
-@interface MyShoeTier : NSObject {
-    
-    ...
-}
+@interface MyShoeTier : NSObject 
 
-@property (noatomic, retain, readonly) MyShoe *shoe;
+// Public method will be declare in .h file
+- (void)publicMethod:(NSInteger)number;
 
+@property (nonatomic, strong, readonly) MyShoe *shoe;
 ...
 
 @end
@@ -227,9 +223,13 @@ MyShoeTier.m
 #import "MyShoeTier.h"
 
 @interface MyShoeTier ()
+
+// Private method will be declare in .m file
 - (void)_crossLace:(MyLace *)firstLace withLace:(MyLace *)secondLace;
-@property (nonatomic, retain, readwrite) MyShoe *shoe;
-@property (nonaomic, retain) NSMutableArray *laces;
+
+@property (nonatomic, strong, readwrite) MyShoe *shoe;
+@property (nonatomic, strong) NSMutableArray *laces;
+
 @end
 
 @implementation MyShoeTier
@@ -238,6 +238,8 @@ MyShoeTier.m
 
 @end
 ```
+
+Private method **always** have a `_` before method name, and will be declared in **.h** file.
 
 Private methods should **always** be created in a class extension for simplicity since a named category can't be used if it adds or modifies any properties.
 
@@ -285,3 +287,10 @@ typedef enum {
     SSHUDViewStyleDark = 12
 } SSHUDViewStyle;
 ```
+
+## Block
+
+```objective-c
+typedef void (^BlockName)(FMClass *response, NSError *error);
+```
+
