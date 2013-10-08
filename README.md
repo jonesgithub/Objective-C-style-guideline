@@ -49,27 +49,39 @@ All Apple types should be used over primitive ones. For example, if you are work
 
 ## Pragma Mark and Implementation Organization
 
-An except of a UIView:
+An expect of a UIView:
 
-```objective-c
-#pragma mark - NSObject
+```objc
+#pragma mark Properties
 
-- (void)dealloc {
-    // Release
-    [super dealloc];
-}
+@dynamic someProperty;
 
+...
 
-#pragma mark - UIView
+- (void)setCustomProperty:(id)value {}
 
-- (id)layoutSubviews {
-    // Stuff
-}
+#pragma mark Lifecycle
 
++ (id)objectWithThing:(id)thing {}
+- (id)init {}
 
-- (void)drawRect:(CGRect)rect {
-    // Drawing code
-}
+#pragma mark Drawing
+
+- (void)drawRect:(CGRect) {}
+
+#pragma mark Another functional grouping
+
+#pragma mark GHSuperclass
+
+- (void)someOverriddenMethod {}
+
+#pragma mark NSCopying
+
+- (id)copyWithZone:(NSZone *)zone {}
+
+#pragma mark NSObject
+
+- (NSString *)description {}
 ```
 
 * Methods should be grouped by inheritance. In the above example, if some `UIResponder` methods were used, they should go between the `NSObject` and `UIView` methods since that's where they fall in the inheritance chain.
