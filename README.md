@@ -5,6 +5,45 @@ Most of these guidelines are to match Apple's documentation and community-accept
 
 This document is mainly targeted toward iOS development, but definitely applies to Mac as well.
 
+## Table of Contents
+
+* [Dot-Notation Syntax](#dot-notation-syntax)
+* [Spacing](#spacing)
+* [Conditionals](#conditionals)
+* [Ternary Operator](#ternary-operator)
+* [Error handling](#error-handling)
+* [Methods](#methods)
+* [Variables](#variables)
+* [Naming](#naming)
+* [Underscores](#underscores)
+* [Comments](#comments)
+* [Init & Dealloc](#init-and-dealloc)
+* [Literals](#literals)
+* [CGRect Functions](#cgrect-functions)
+* [Constants](#constants)
+* [Enumerated Types](#enumerated-types)
+* [Private Properties](#private-properties)
+* [Image Naming](#image-naming)
+* [Booleans](#booleans)
+* [Singletons](#singletons)
+* [Xcode Project](#xcode-project)
+
+## Dot-Notation Syntax
+
+Dot-notation should **always** be used for accessing and mutating properties. Bracket notation is preferred in all other instances.
+
+**For example:**
+```objc
+view.backgroundColor = [UIColor orangeColor];
+[UIApplication sharedApplication].delegate;
+```
+
+**Not:**
+```objc
+[view setBackgroundColor:[UIColor orangeColor]];
+UIApplication.sharedApplication.delegate;
+```
+
 ## Operators
 
 ```objective-c
@@ -208,6 +247,10 @@ From the [Objective-C Programming Guide](http://developer.apple.com/library/mac/
 @property (nonatomic, assign, getter=isLoading) BOOL loading;
 ```
 
+* Variables should be named as descriptively as possible. Single letter variable names should be avoided except in `for()` loops.
+
+* Asterisks indicating pointers belong with the variable, e.g., `NSString *text` not `NSString* text` or `NSString * text`, except in the case of constants.
+
 * If the property is `nonatomic`, it should be first. The next option should **always** be `strong`, `weak` or `assign` since if it is omitted, there is a warning. `readonly` should be the next option if it is specified. `readwrite` should never be specified in header file. `readwrite` should only be used in class extensions. `getter` or `setter` should be last. `setter` should rarely be used.
 
 * See an example of `readwrite` in the *Private Methods* section.
@@ -315,6 +358,29 @@ typedef enum {
  * Use exceptions only to indicate programmer error.
  * To indicate errors, use an `NSError **` argument or send an error on a [ReactiveCocoa](https://github.com/ReactiveCocoa/ReactiveCocoa) signal.
 
+ * When methods return an error parameter by reference, switch on the returned value, not the error variable.
+
+**For example:**
+```objc
+NSError *error;
+if (![self trySomethingWithError:&error]) {
+    // Handle Error
+}
+```
+
+**Not:**
+```objc
+NSError *error;
+[self trySomethingWithError:&error];
+if (error) {
+    // Handle Error
+}
+```
+
+Some of Apple’s APIs write garbage values to the error parameter (if non-NULL) in successful cases, so switching on the error can cause false negatives (and subsequently crash).
+
+
+
 ## Blocks
 
  * Blocks should have a space between their return type and name.
@@ -339,13 +405,32 @@ id (^blockName2)(id) = ^ id (id args) {
 ## Literals
 
  * Avoid making numbers a specific type unless necessary (for example, prefer `5` to `5.0`, and `5.3` to `5.3f`).
- * The contents of array and dictionary literals should have a space on both sides.
  * Dictionary literals should have no space between the key and the colon, and a single space between colon and value.
 
 ``` objc
-NSArray *theShit = @[ @1, @2, @3 ];
+NSArray *theShit = @[@1, @2, @3 ;
 
-NSDictionary *keyedShit = @{ GHDidCreateStyleGuide: @YES };
+NSDictionary *keyedShit = @{GHDidCreateStyleGuide: @YES};
+```
+
+ * `NSString`, `NSDictionary`, `NSArray`, and `NSNumber` literals should be used whenever creating immutable instances of those objects. Pay special care that `nil` values not be passed into `NSArray` and `NSDictionary` literals, as this will cause a crash.
+
+**For example:**
+
+```objc
+NSArray *names = @[@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul"];
+NSDictionary *productManagers = @{@"iPhone" : @"Kate", @"iPad" : @"Kamal", @"Mobile Web" : @"Bill"};
+NSNumber *shouldUseLiterals = @YES;
+NSNumber *buildingZIPCode = @10018;
+```
+
+**Not:**
+
+```objc
+NSArray *names = [NSArray arrayWithObjects:@"Brian", @"Matt", @"Chris", @"Alex", @"Steve", @"Paul", nil];
+NSDictionary *productManagers = [NSDictionary dictionaryWithObjectsAndKeys: @"Kate", @"iPhone", @"Kamal", @"iPad", @"Bill", @"Mobile Web", nil];
+NSNumber *shouldUseLiterals = [NSNumber numberWithBool:YES];
+NSNumber *buildingZIPCode = [NSNumber numberWithInteger:10018];
 ```
 
  * Longer or more complex literals should be split over multiple lines (optionally with a terminating comma):
@@ -372,3 +457,50 @@ NSDictionary *keyedShit = @{
  * Category methods should always be prefixed.
  * If you need to expose private methods for subclasses or unit testing, create a class extension named `Class+Private`.
 
+## CGRect Functions
+
+When accessing the `x`, `y`, `width`, or `height` of a `CGRect`, always use the [`CGGeometry` functions](http://developer.apple.com/library/ios/#documentation/graphicsimaging/reference/CGGeometry/Reference/reference.html) instead of direct struct member access. From Apple's `CGGeometry` reference:
+
+> All functions described in this reference that take CGRect data structures as inputs implicitly standardize those rectangles before calculating their results. For this reason, your applications should avoid directly reading and writing the data stored in the CGRect data structure. Instead, use the functions described here to manipulate rectangles and to retrieve their characteristics.
+
+**For example:**
+
+```objc
+CGRect frame = self.view.frame;
+
+CGFloat x = CGRectGetMinX(frame);
+CGFloat y = CGRectGetMinY(frame);
+CGFloat width = CGRectGetWidth(frame);
+CGFloat height = CGRectGetHeight(frame);
+```
+
+**Not:**
+
+```objc
+CGRect frame = self.view.frame;
+
+CGFloat x = frame.origin.x;
+CGFloat y = frame.origin.y;
+CGFloat width = frame.size.width;
+CGFloat height = frame.size.height;
+```
+
+## Constants
+
+Constants are preferred over in-line string literals or numbers, as they allow for easy reproduction of commonly used variables and can be quickly changed without the need for find and replace. Constants should be declared as `static` constants and not `#define`s unless explicitly being used as a macro.
+
+**For example:**
+
+```objc
+static NSString * const NYTAboutViewControllerCompanyName = @"The New York Times Company";
+
+static const CGFloat NYTImageThumbnailHeight = 50.0;
+```
+
+**Not:**
+
+```objc
+#define CompanyName @"The New York Times Company"
+
+#define thumbnailHeight 2
+```
