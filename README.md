@@ -38,13 +38,13 @@ All Apple types should be used over primitive ones. For example, if you are work
 }
 ```
 
-There should **always** be a space between the `-` or `+` and the return type (`(void)` in this example). There should **never** be a space between the return type and the method name.
+* There should **always** be a space between the `-` or `+` and the return type (`(void)` in this example). There should **never** be a space between the return type and the method name.
 
-There should **never** be a space before or after colons `(` `)`. If the parameter type is a pointer, there should **always** be a space between the class and the `*`.
+* There should **never** be a space before or after colons `(` `)`. If the parameter type is a pointer, there should **always** be a space between the class and the `*`.
 
-There should **always** be a space between the end of the method and the opening bracket `{`. The opening bracket should **never** be on the following line.
+* There should **always** be a space between the end of the method and the opening bracket `{`. The opening bracket should **never** be on the following line.
 
-There should **always** be `2` new lines between methods. This matches some Xcode templates (although they change a lot) and increase readability.
+* There should **always** be `2` new lines between methods. This matches some Xcode templates (although they change a lot) and increase readability.
 
 
 ## Pragma Mark and Implementation Organization
@@ -72,12 +72,12 @@ An except of a UIView:
 }
 ```
 
-Methods should be grouped by inheritance. In the above example, if some `UIResponder` methods were used, they should go between the `NSObject` and `UIView` methods since that's where they fall in the inheritance chain.
+* Methods should be grouped by inheritance. In the above example, if some `UIResponder` methods were used, they should go between the `NSObject` and `UIView` methods since that's where they fall in the inheritance chain.
 
 
 ## Control Structures
 
-There should **always** be a `space` after the control structure (i.e. `if`, `else`, `switch`, `while`, `for`, `for in`, etc).
+* There should **always** be a `space` after the control structure (i.e. `if`, `else`, `switch`, `while`, `for`, `for in`, etc).
 
 
 ### If/Else
@@ -92,7 +92,7 @@ if (button.enabled) {
 }
 ```
 
-`else` statements should begin on the same line as their preceding `if` statement.
+* `else` statements should begin on the same line as their preceding `if` statement.
     
 ```objective-c
 // Comment explaining the conditional
@@ -106,7 +106,7 @@ else {
 }
 ```
 
-If comments are desired around the `if` and `else` statement, they should be formatted like the example above.
+* If comments are desired around the `if` and `else` statement, they should be formatted like the example above.
 
 
 ### Switch
@@ -136,7 +136,7 @@ switch (something.state) {
 }
 ```
 
-Brackets `{ }` are desired around **each case**. If multiple cases are used, they should be on **separate lines**. `default` should **always** be the last case and should **always** be included.
+* Brackets `{ }` are desired around **each case**. If multiple cases are used, they should be on **separate lines**. `default` should **always** be the last case and should **always** be included.
 
 
 ### For
@@ -152,7 +152,7 @@ for (NSString *key in dictionary) {
 }
 ```
 
-When iterating using integers, it is preferred to start at `0` and use `<` rather than starting at `1` and using `<=`. Fast enumeration is generally preferred.
+* When iterating using integers, it is preferred to start at `0` and use `<` rather than starting at `1` and using `<=`. Fast enumeration is generally preferred.
 
 
 ### While
@@ -165,7 +165,7 @@ while (something < somethingElse) {
 
 ## Import
 
-**Always** use `@class` whenever possible in header files instead of `#import` since it has a slight compile time performance boost.
+* **Always** use `@class` whenever possible in header files instead of `#import` since it has a slight compile time performance boost.
 
 From the [Objective-C Programming Guide](http://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjectiveC/ObjC.pdf) (Page 38):
 
@@ -173,9 +173,9 @@ From the [Objective-C Programming Guide](http://developer.apple.com/library/mac/
 
 ### Header Prefix
 
-Adding frameworks that are used in the majority of a project to a header prefix is preferred. If these frameworks are in the header prefix, they should **never** be imported in source files in the project.
+* Adding frameworks that are used in the majority of a project to a header prefix is preferred. If these frameworks are in the header prefix, they should **never** be imported in source files in the project.
 
-For example, if a header prefix looks like the following:
+* For example, if a header prefix looks like the following:
 
 ```objective-c
 #ifdef __OBJC__
@@ -196,9 +196,9 @@ For example, if a header prefix looks like the following:
 @property (nonatomic, assign, getter=isLoading) BOOL loading;
 ```
 
-If the property is `nonatomic`, it should be first. The next option should **always** be `strong`, `weak` or `assign` since if it is omitted, there is a warning. `readonly` should be the next option if it is specified. `readwrite` should never be specified in header file. `readwrite` should only be used in class extensions. `getter` or `setter` should be last. `setter` should rarely be used.
+* If the property is `nonatomic`, it should be first. The next option should **always** be `strong`, `weak` or `assign` since if it is omitted, there is a warning. `readonly` should be the next option if it is specified. `readwrite` should never be specified in header file. `readwrite` should only be used in class extensions. `getter` or `setter` should be last. `setter` should rarely be used.
 
-See an example of `readwrite` in the *Private Methods* section.
+* See an example of `readwrite` in the *Private Methods* section.
 
 
 ## Private Methods and Properties
@@ -206,12 +206,13 @@ See an example of `readwrite` in the *Private Methods* section.
 MyShoeTier.h
 
 ```objective-c
-@interface MyShoeTier : NSObject 
+@interface MyShoeTier : NSObject <Protocal1, Protocal2, Protocal3, ...>
 
 // Public method will be declare in .h file
 - (void)publicMethod:(NSInteger)number;
 
-@property (nonatomic, strong, readonly) MyShoe *shoe;
+@property (nonatomic, strong, readonly) MyShoe *publicShoe;
+@property (nonatomic, weak) NSObject<Protocol> *object;
 ...
 
 @end
@@ -227,21 +228,29 @@ MyShoeTier.m
 // Private method will be declare in .m file
 - (void)_crossLace:(MyLace *)firstLace withLace:(MyLace *)secondLace;
 
-@property (nonatomic, strong, readwrite) MyShoe *shoe;
+@property (nonatomic, strong, readwrite) MyShoe *privateShoe;
 @property (nonatomic, strong) NSMutableArray *laces;
 
 @end
 
 @implementation MyShoeTier
 
-...
+// This is a private method
+- (void)_crossLace:(MyLace *)firstLace withLace:(MyLace *)secondLace {
+    
+    // Use self + dot when access public properties
+    self.publicShoe = nil;
+
+    // Use `_` when access private properties
+    _privateShoe = nil;
+}
 
 @end
 ```
 
-Private method **always** have a `_` before method name, and will be declared in **.h** file.
+* Private method **always** have a `_` before method name, and will be declared in **.h** file.
 
-Private methods should **always** be created in a class extension for simplicity since a named category can't be used if it adds or modifies any properties.
+* Private methods should **always** be created in a class extension for simplicity since a named category can't be used if it adds or modifies any properties.
 
 Note: The above example provides an example for an acceptable use of a `readwrite` property.
 
@@ -257,11 +266,11 @@ static NSString *staticString;
 
 ## Naming
 
-In general, everything should be prefixed with a 2-3 letter prefix. Longer prefixes are acceptable, but not recommended.
+* In general, everything should be prefixed with a 2-3 letter prefix. Longer prefixes are acceptable, but not recommended.
 
-It is a good idea to prefix classes with an application specific application if it is application specific code. If there is code you plan on using in other applications or open sourcing, it is a good idea to do something specific to your or your company for the prefix.
+* It is a good idea to prefix classes with an application specific application if it is application specific code. If there is code you plan on using in other applications or open sourcing, it is a good idea to do something specific to your or your company for the prefix.
 
-If you company name is *Awesome Buckets* and you have an application named *Bucket Hunter*, here are a few examples:
+* If you company name is *Awesome Buckets* and you have an application named *Bucket Hunter*, here are a few examples:
 
 ```objective-c
 ABLoadingView // Simple view that can be used in other applications
@@ -288,9 +297,66 @@ typedef enum {
 } SSHUDViewStyle;
 ```
 
-## Block
+## Exceptions and Error Handling
+
+ * Don't use exceptions for flow control.
+ * Use exceptions only to indicate programmer error.
+ * To indicate errors, use an `NSError **` argument or send an error on a [ReactiveCocoa](https://github.com/ReactiveCocoa/ReactiveCocoa) signal.
+
+## Blocks
+
+ * Blocks should have a space between their return type and name.
+ * Block definitions should omit their return type when possible.
+ * Block definitions should omit their arguments if they are `void`.
+ * Parameters in block types should be named unless the block is initialized immediately.
 
 ```objective-c
 typedef void (^BlockName)(FMClass *response, NSError *error);
 ```
+
+```objc
+void (^blockName1)(void) = ^{
+    // do some things
+};
+
+id (^blockName2)(id) = ^ id (id args) {
+    // do some things
+};
+```
+
+## Literals
+
+ * Avoid making numbers a specific type unless necessary (for example, prefer `5` to `5.0`, and `5.3` to `5.3f`).
+ * The contents of array and dictionary literals should have a space on both sides.
+ * Dictionary literals should have no space between the key and the colon, and a single space between colon and value.
+
+``` objc
+NSArray *theShit = @[ @1, @2, @3 ];
+
+NSDictionary *keyedShit = @{ GHDidCreateStyleGuide: @YES };
+```
+
+ * Longer or more complex literals should be split over multiple lines (optionally with a terminating comma):
+
+``` objc
+NSArray *theShit = @[
+    @"Got some long string objects in here.",
+    [AndSomeModelObjects too],
+    @"Moar strings."
+];
+
+NSDictionary *keyedShit = @{
+    @"this.key": @"corresponds to this value",
+    @"otherKey": @"remoteData.payload",
+    @"some": @"more",
+    @"JSON": @"keys",
+    @"and": @"stuff",
+};
+```
+
+## Categories
+
+ * Categories should be named for the sort of functionality they provide. Don't create umbrella categories.
+ * Category methods should always be prefixed.
+ * If you need to expose private methods for subclasses or unit testing, create a class extension named `Class+Private`.
 
