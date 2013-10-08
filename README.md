@@ -5,6 +5,7 @@ This guideline is made by Huy Ares. Use to create a standard of code for my proj
 
 ## Table of Contents
 
+* [Comment](#comment)
 * [Dot-Notation Syntax](#dot-notation-syntax)
 * [Operators](#operators)
 * [Types](#types)
@@ -27,6 +28,23 @@ This guideline is made by Huy Ares. Use to create a standard of code for my proj
 * [Booleans](#booleans)
 * [Singletons](#singletons)
 * [Xcode Project](#xcode-project)
+
+## Comment
+
+* All method and properties **must** be comment with VVDocument
+
+**Examples**
+```objc
+/**
+ *  <#Description#>
+ *
+ *  @param block      <#block description#>
+ *  @param parameters <#parameters description#>
+ */
++ (void)getProduct:(void (^)(NSArray *ListProduct, NSObject *error))block parameters:(NSDictionary *)parameters;
+```
+
+* Write readable code to avoid comment in code as less as possible
 
 ## Dot-Notation Syntax
 
